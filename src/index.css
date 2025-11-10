@@ -1,0 +1,269 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+      sans-serif;
+    line-height: 1.6;
+    font-weight: 400;
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* CSS variables for theme - Modern Blog Design (Purple/Blue Theme) */
+    --radius: 0.75rem;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 262 83% 95%;
+    --accent-foreground: 262 83% 58%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 262 83% 58%;
+    --chart-1: 262 83% 58%;
+    --chart-2: 200 98% 39%;
+    --chart-3: 280 65% 60%;
+    --chart-4: 173 58% 39%;
+    --chart-5: 43 74% 66%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262 83% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 83% 65%;
+    --chart-1: 262 83% 65%;
+    --chart-2: 200 98% 50%;
+    --chart-3: 280 65% 70%;
+    --chart-4: 173 58% 50%;
+    --chart-5: 43 74% 70%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    margin: 0;
+    min-width: 320px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Animations for page transitions */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-in-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    animation-name: fade-in;
+  }
+
+  .slide-in-from-left {
+    animation-name: slide-in-from-left;
+  }
+
+  .slide-in-from-right {
+    animation-name: slide-in-from-right;
+  }
+
+  .duration-500 {
+    animation-duration: 500ms;
+  }
+
+  .duration-700 {
+    animation-duration: 700ms;
+  }
+}
+
+/* Base link styles */
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+/* Prose styles for article content */
+.prose h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.3;
+}
+
+.prose p {
+  margin-bottom: 1.25em;
+  line-height: 1.7;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+/* Custom button styles for non-Shadcn buttons */
+.custom-button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.custom-button:hover {
+  border-color: #646cff;
+}
+.custom-button:focus,
+.custom-button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  .custom-button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Colored Icon Styles */
+.icon-primary {
+  color: hsl(217, 91%, 45%);
+}
+
+.icon-success {
+  color: hsl(142, 76%, 36%);
+}
+
+.icon-warning {
+  color: hsl(43, 96%, 56%);
+}
+
+.icon-danger {
+  color: hsl(0, 84%, 60%);
+}
+
+.icon-info {
+  color: hsl(199, 89%, 48%);
+}
+
+.icon-gradient {
+  background: linear-gradient(135deg, hsl(217, 91%, 45%), hsl(173, 58%, 45%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Social Media Icon Colors */
+.icon-facebook {
+  color: #1877f2;
+}
+
+.icon-twitter {
+  color: #1da1f2;
+}
+
+.icon-youtube {
+  color: #ff0000;
+}
+
+.icon-mail {
+  color: #ea4335;
+}
+
+/* Dark mode icon adjustments */
+.dark .icon-primary {
+  color: hsl(217, 91%, 60%);
+}
+
+.dark .icon-success {
+  color: hsl(142, 76%, 46%);
+}
+
+.dark .icon-warning {
+  color: hsl(43, 96%, 66%);
+}
