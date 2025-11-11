@@ -2,14 +2,20 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { useEffect } from "react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import Chatbot from "@/components/Chatbot"
 import Home from "@/pages/Home"
 import ArticleDetail from "@/pages/ArticleDetail"
 import About from "@/pages/About"
 import Login from "@/pages/Login"
 import Register from "@/pages/Register"
+import AdminLayout from "@/pages/AdminLayout"
+import AdminDashboard from "@/pages/AdminDashboard"
+
 import { ThemeProvider } from "./contexts/ThemeProvider"
 import { Toaster } from "@/components/ui/sonner"
 import { useAuthStore } from "@/stores/authStore"
+import Profile from "./pages/Profile"
+import PostCreate from "./pages/PostCreate"
 
 export default function App() {
   const initAuth = useAuthStore((state) => state.initAuth)
@@ -26,7 +32,10 @@ export default function App() {
           {/* Auth Routes - No Header/Footer */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
+          {/* Admin Routes */}
+          <Route path="/admin/*" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+          </Route>
           {/* Main Routes - With Header/Footer */}
           <Route path="/*" element={
             <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -36,9 +45,12 @@ export default function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/article/:id" element={<ArticleDetail />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/post-create" element={<PostCreate />} />
                 </Routes>
               </main>
               <Footer />
+              <Chatbot />
             </div>
           } />
         </Routes>

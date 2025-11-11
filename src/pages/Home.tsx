@@ -2,172 +2,185 @@ import ArticleCard from "@/components/ArticleCard"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import axios from "@/lib/axios"
 import { Link } from "react-router-dom"
-
-const sample = [
+const categories = ['Tất cả', 'Kinh tế số', 'Chuyển đổi số', 'Bất động sản', 'Đầu tư', 'Chính sách', 'E-commerce']
+const popularPosts = [
     {
         id: '1',
-        title: 'Tương lai của Kinh tế Việt Nam trong Kỷ nguyên Số',
-        excerpt: 'Phân tích sâu về xu hướng chuyển đổi số đang định hình lại nền kinh tế Việt Nam, từ thương mại điện tử đến fintech và cơ hội cho doanh nghiệp trong bối cảnh hội nhập quốc tế.',
-        date: '10 tháng 11, 2025',
-        tags: ['Kinh tế số', 'Chuyển đổi số'],
+        title: 'Tác động của chính sách tiền tệ đến kinh tế Việt Nam',
+        excerpt: 'Phân tích các chính sách tiền tệ mới và ảnh hưởng của chúng đến tăng trưởng kinh tế, lạm phát và đầu tư tại Việt Nam.',
+        date: '01 tháng 11, 2025',
+        tags: ['Kinh tế', 'Chính sách'],
         author: 'Nguyễn Văn A',
-        readTime: '8 phút đọc',
-        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
-        featured: true
+        readTime: '7 phút đọc',
+        category: 'Kinh tế',
+        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=400&fit=crop'
     },
     {
         id: '2',
-        title: 'Xu hướng Đầu tư Bất động sản 2025',
-        excerpt: 'Thị trường bất động sản Việt Nam đang có những biến động mạnh. Phân tích các cơ hội đầu tư tiềm năng và rủi ro cần lưu ý trong năm 2025.',
-        date: '09 tháng 11, 2025',
-        tags: ['Bất động sản', 'Đầu tư'],
+        title: 'Vai trò của chính trị trong phát triển kinh tế quốc gia',
+        excerpt: 'Bài viết bàn về mối quan hệ giữa chính trị ổn định và sự phát triển kinh tế bền vững, các ví dụ thực tiễn từ Việt Nam và thế giới.',
+        date: '05 tháng 11, 2025',
+        tags: ['Chính trị', 'Kinh tế'],
         author: 'Trần Thị B',
         readTime: '6 phút đọc',
-        image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop'
+        category: 'Chính trị',
+        image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=600&h=400&fit=crop'
     },
     {
         id: '3',
-        title: 'Chính sách Thuế Mới và Tác động đến Doanh nghiệp',
-        excerpt: 'Chính phủ vừa công bố gói chính sách thuế mới nhằm hỗ trợ doanh nghiệp. Đánh giá chi tiết về các điểm quan trọng và cách thức áp dụng.',
-        date: '08 tháng 11, 2025',
-        tags: ['Chính sách', 'Thuế'],
+        title: 'Thách thức và cơ hội cho kinh tế Việt Nam trong bối cảnh toàn cầu hóa',
+        excerpt: 'Toàn cầu hóa mang lại nhiều cơ hội nhưng cũng đặt ra không ít thách thức cho nền kinh tế Việt Nam. Bài viết phân tích sâu các yếu tố này.',
+        date: '10 tháng 11, 2025',
+        tags: ['Kinh tế', 'Toàn cầu hóa'],
         author: 'Lê Văn C',
-        readTime: '10 phút đọc',
-        image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop'
+        readTime: '8 phút đọc',
+        category: 'Kinh tế',
+        image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?w=600&h=400&fit=crop'
     },
     {
         id: '4',
-        title: 'Thương mại Điện tử: Cơ hội và Thách thức',
-        excerpt: 'E-commerce đang bùng nổ tại Việt Nam với tốc độ tăng trưởng ấn tượng. Tìm hiểu về những cơ hội kinh doanh và thách thức cần vượt qua.',
-        date: '07 tháng 11, 2025',
-        tags: ['E-commerce', 'Kinh doanh'],
+        title: 'Chính sách phát triển bền vững và kinh tế xanh',
+        excerpt: 'Khám phá các chính sách phát triển bền vững, kinh tế xanh và tác động của chúng đến môi trường và xã hội Việt Nam.',
+        date: '11 tháng 11, 2025',
+        tags: ['Chính sách', 'Kinh tế xanh'],
         author: 'Phạm Thị D',
-        readTime: '7 phút đọc',
-        image: 'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&h=600&fit=crop'
+        readTime: '5 phút đọc',
+        category: 'Chính sách',
+        image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop'
     },
-]
-
-const popularPosts = [
     {
         id: '5',
-        title: 'Xu hướng Khởi nghiệp Công nghệ tại Việt Nam',
-        excerpt: 'Sự lựa chọn giữa khởi nghiệp trong nước hay mở rộng ra quốc tế phụ thuộc vào nhiều yếu tố. Phân tích ưu nhược điểm của từng con đường.',
-        date: '13 tháng 3, 2023',
-        tags: ['Khởi nghiệp', 'Công nghệ'],
-        author: 'Hoàng Văn E',
-        readTime: '5 phút đọc',
-        category: 'Travel',
-        image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=400&fit=crop'
+        title: 'Ảnh hưởng của chính trị quốc tế đến kinh tế Việt Nam',
+        excerpt: 'Phân tích các biến động chính trị quốc tế và tác động của chúng đến nền kinh tế Việt Nam trong năm 2025.',
+        date: '09 tháng 11, 2025',
+        tags: ['Chính trị', 'Kinh tế quốc tế'],
+        author: 'Vũ Văn E',
+        readTime: '6 phút đọc',
+        category: 'Chính trị',
+        image: 'https://images.unsplash.com/photo-1465101178521-c1a6bca7a0c1?w=600&h=400&fit=crop'
     },
     {
         id: '6',
-        title: 'Cách xây dựng Website để nghiên cứu dự án tiếp theo',
-        excerpt: 'Tận dụng công nghệ để xác định giá trị gia tăng trong hoạt động kinh doanh. Tối ưu hóa quy trình và tăng cường lợi thế cạnh tranh với các công cụ số.',
-        date: '7 tháng 3, 2023',
-        tags: ['Website', 'Nghiên cứu'],
-        author: 'Vũ Thị F',
-        readTime: '6 phút đọc',
-        category: 'DEVELOPMENT',
-        image: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&h=400&fit=crop'
-    },
-    {
-        id: '7',
-        title: 'Làm thế nào để trở thành Vận động viên chuyên nghiệp 2023',
-        excerpt: 'Phát triển theo quan điểm toàn diện về đổi mới trong lĩnh vực công nghệ và trao quyền. Chiến lược để đảm bảo chủ động.',
-        date: '10 tháng 3, 2023',
-        tags: ['Thể thao', 'Nghề nghiệp'],
-        author: 'Đỗ Văn G',
-        readTime: '8 phút đọc',
-        category: 'Sports',
-        image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=400&fit=crop'
-    },
-    {
-        id: '8',
-        title: 'Ca sĩ nào xuất sắc nhất trong bảng xếp hạng? Biết họ không?',
-        excerpt: 'Phân tích Billboard để xếp hạng ca sĩ xuất sắc dựa trên hiệu suất hàng tuần của họ trong 100 bảng xếp hạng Billboard Hot.',
-        date: '13 tháng 3, 2023',
-        tags: ['Âm nhạc', 'Giải trí'],
-        author: 'Mai Thị H',
-        readTime: '4 phút đọc',
-        category: 'Travel',
-        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop'
-    },
-    {
-        id: '9',
-        title: 'Cách bắt đầu xuất khẩu nhập khẩu kinh doanh từ nhà?',
-        excerpt: 'Tận dụng công nghệ để xác định giá trị gia tăng trong hoạt động. Doanh nghiệp xây dựng sản phẩm hoặc công cụ giúp người khác.',
-        date: '7 tháng 3, 2023',
-        tags: ['Kinh doanh', 'Xuất khẩu'],
-        author: 'Bùi Văn I',
+        title: 'Đổi mới sáng tạo trong chính sách kinh tế Việt Nam',
+        excerpt: 'Bài viết trình bày các xu hướng đổi mới sáng tạo trong chính sách kinh tế, các giải pháp thúc đẩy tăng trưởng và phát triển.',
+        date: '08 tháng 11, 2025',
+        tags: ['Kinh tế', 'Đổi mới'],
+        author: 'Đặng Thị F',
         readTime: '7 phút đọc',
-        category: 'DEVELOPMENT',
-        image: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=600&h=400&fit=crop'
-    },
-    {
-        id: '10',
-        title: 'Làm đồ uống với sô cô la socola và sữa',
-        excerpt: 'Phát triển theo quan điểm toàn diện về đổi mới đột phá và trao quyền. Đa dạng hóa để đảm bảo chủ động và tồn tại.',
-        date: '10 tháng 3, 2023',
-        tags: ['Ẩm thực', 'Công thức'],
-        author: 'Lý Thị K',
-        readTime: '3 phút đọc',
-        category: 'Sports',
-        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&h=400&fit=crop'
+        category: 'Kinh tế',
+        image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=600&h=400&fit=crop'
     },
 ]
-
-const categories = ['Tất cả', 'Kinh tế số', 'Chuyển đổi số', 'Bất động sản', 'Đầu tư', 'Chính sách', 'E-commerce']
-
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('Tất cả')
+    type Post = {
+        _id: string;
+        title: string;
+        summary: string;
+        excerpt?: string;
+        content?: string;
+        images?: string[];
+        tags?: string[];
+        date?: string;
+        author?: string;
+        readTime?: string;
+        featured?: boolean;
+        publishedAt?: string;
+        userId?: {
+            name?: string;
+            avatar?: string;
+        };
+    };
+    const [posts, setPosts] = useState<Post[]>([])
+    // Removed unused loading and error states
 
-    const filteredArticles = sample.filter(article => {
-        const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-        const matchesCategory = selectedCategory === 'Tất cả' || article.tags?.includes(selectedCategory)
+    useEffect(() => {
+        axios.get('/posts?page=1&limit=10')
+            .then(res => {
+                setPosts(res.data?.data?.posts || [])
+            })
+            .catch(() => {
+                setPosts([])
+            })
+    }, [])
+
+    const filteredArticles = posts.filter(article => {
+        const matchesSearch = article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            article.summary?.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesCategory = selectedCategory === 'Tất cả' || (article.tags && article.tags.includes(selectedCategory))
         return matchesSearch && matchesCategory
     })
 
     return (
         <div className="space-y-12">
             {/* Hero Section - Featured Post */}
-            <section className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary via-primary/90 to-primary/70 shadow-2xl">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iYSIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj48cGF0aCBkPSJNMCAzOGgyYTM4IDM4IDAgMCAwIDM4LTM4djJhMzggMzggMCAwIDEtMzggMzhaIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+')] opacity-30"></div>
+            <section className="relative overflow-hidden rounded-2xl shadow-2xl">
+                {/* Background Image with Overlay */}
+                <div className="absolute inset-0">
+                    <img
+                        src={filteredArticles[0]?.images?.[0] || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop'}
+                        alt={filteredArticles[0]?.title}
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/40"></div>
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iYSIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj48cGF0aCBkPSJNMCAzOGgyYTM4IDM4IDAgMCAwIDM4LTM4djJhMzggMzggMCAwIDEtMzggMzhaIiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4wNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg==')] opacity-50"></div>
+                </div>
 
-                <div className="grid md:grid-cols-2 gap-8 items-center">
-                    {/* Featured Image */}
-                    <div className="relative aspect-video md:aspect-4/3 overflow-hidden">
-                        <img
-                            src={filteredArticles[0]?.image || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop'}
-                            alt={filteredArticles[0]?.title}
-                            className="w-full h-full object-cover"
-                        />
-                    </div>
+                {/* Content */}
+                <div className="relative z-10 px-8 py-16 md:px-16 md:py-24 max-w-3xl">
+                    <Badge className="mb-4 bg-primary text-white border-0 hover:bg-primary/90 text-sm px-4 py-1.5 shadow-lg">
+                        ⭐ Bài viết nổi bật
+                    </Badge>
 
-                    {/* Featured Content */}
-                    <div className="relative z-10 p-8 md:p-12 md:pr-16">
-                        <Badge className="mb-4 bg-white/20 text-white border-white/30 hover:bg-white/30 text-sm px-3 py-1">
-                            Bài viết nổi bật
-                        </Badge>
-                        {filteredArticles[0]?.tags && filteredArticles[0].tags.length > 0 && (
-                            <div className="text-xs text-white/80 font-semibold mb-2 uppercase tracking-wider">
+                    {filteredArticles[0]?.tags && filteredArticles[0].tags.length > 0 && (
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="text-xs text-white/90 font-bold uppercase tracking-widest bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
                                 {filteredArticles[0].tags[0]}
-                            </div>
-                        )}
-                        <h1 className="text-2xl md:text-4xl font-bold mb-4 leading-tight text-white">
-                            {filteredArticles[0]?.title || 'Tương lai của Kinh tế Việt Nam trong Kỷ nguyên Số'}
-                        </h1>
-                        <p className="text-base md:text-lg text-white/90 mb-6 leading-relaxed line-clamp-3">
-                            {filteredArticles[0]?.excerpt || 'Phân tích sâu về xu hướng chuyển đổi số đang định hình lại nền kinh tế Việt Nam...'}
-                        </p>
-                        <Link to={`/article/${filteredArticles[0]?.id || '1'}`}>
-                            <button className="bg-white text-primary font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            </span>
+                            {filteredArticles[0]?.date && (
+                                <span className="text-xs text-white/70">
+                                    • {new Date(filteredArticles[0].publishedAt || filteredArticles[0].date).toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                        {filteredArticles[0]?.title || 'Tương lai của Kinh tế Việt Nam trong Kỷ nguyên Số'}
+                    </h1>
+
+                    <p className="text-base md:text-xl text-white/95 mb-8 leading-relaxed line-clamp-2 drop-shadow-md">
+                        {filteredArticles[0]?.summary || 'Phân tích sâu về xu hướng chuyển đổi số đang định hình lại nền kinh tế Việt Nam...'}
+                    </p>
+
+                    <div className="flex items-center gap-4 flex-wrap">
+                        <Link to={`/article/${filteredArticles[0]?._id || '1'}`}>
+                            <button className="bg-primary text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-primary/90 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1">
                                 Đọc ngay →
                             </button>
                         </Link>
+
+                        {filteredArticles[0]?.userId?.name && (
+                            <div className="flex items-center gap-3 text-white/90">
+                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden border-2 border-white/30">
+                                    {filteredArticles[0]?.userId?.avatar ? (
+                                        <img src={filteredArticles[0].userId.avatar} alt={filteredArticles[0].userId.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-white font-semibold text-sm">
+                                            {filteredArticles[0].userId.name.charAt(0).toUpperCase()}
+                                        </span>
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold drop-shadow">{filteredArticles[0].userId.name}</p>
+                                    <p className="text-xs text-white/70">{filteredArticles[0]?.readTime || '5 phút đọc'}</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -209,15 +222,23 @@ export default function Home() {
 
             {/* Articles Grid - 3 columns */}
             <section>
-                {filteredArticles.length > 1 ? (
+                {filteredArticles.length > 0 ? (
                     <div className="grid md:grid-cols-3 gap-6">
-                        {filteredArticles.slice(1).map((a) => (
-                            <ArticleCard key={a.id} {...a} compact />
+                        {filteredArticles.map((a) => (
+                            <ArticleCard
+                                key={a._id || 'unknown'}
+                                id={a._id || 'unknown'}
+                                title={a.title || 'Không có tiêu đề'}
+                                excerpt={a.summary || a.excerpt || 'Không có mô tả'}
+                                date={a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : (a.date || 'Chưa có ngày')}
+                                tags={a.tags && a.tags.length > 0 ? a.tags : ['Chưa có tag']}
+                                author={a.userId?.name || a.author || 'Admin'}
+                                authorAvatar={a.userId?.avatar || undefined}
+                                readTime={a.readTime || '5 phút đọc'}
+                                image={a.images && a.images.length > 0 ? a.images[0] : 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop'}
+                                compact
+                            />
                         ))}
-                    </div>
-                ) : filteredArticles.length === 1 ? (
-                    <div className="text-center py-16 bg-muted/30 rounded-xl border-2 border-dashed">
-                        <p className="text-muted-foreground text-lg">Chỉ có một bài viết phù hợp</p>
                     </div>
                 ) : (
                     <div className="text-center py-16 bg-muted/30 rounded-xl border-2 border-dashed">
@@ -226,7 +247,6 @@ export default function Home() {
                     </div>
                 )}
             </section>
-
             {/* Popular Post Section */}
             <section className="space-y-6 py-8">
                 <div className="flex items-center justify-between">

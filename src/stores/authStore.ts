@@ -13,6 +13,7 @@ interface AuthState {
   token: string | null
   isAuthenticated: boolean
   setAuth: (user: User, token: string) => void
+  updateUser: (user: User) => void
   logout: () => void
   initAuth: () => void
 }
@@ -31,6 +32,15 @@ export const useAuthStore = create<AuthState>()(
           token,
           isAuthenticated: true,
         })
+      },
+
+      // Update user data
+      updateUser: (user) => {
+        set((state) => ({
+          user: { ...state.user, ...user },
+        }))
+        // Also update localStorage
+        localStorage.setItem('user', JSON.stringify(user))
       },
 
       // Logout

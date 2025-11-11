@@ -54,6 +54,10 @@ export default function Header() {
                         Về chúng tôi
                     </button>
 
+                    <Link className="px-4 py-2 text-sm text-orange-700 dark:text-orange-300 hover:text-white hover:bg-linear-to-r hover:from-primary hover:to-orange-500 rounded-lg transition-all font-semibold" to="/post-create">
+                        Đăng bài
+                    </Link>
+
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="ml-2 relative group hover:bg-accent">
@@ -89,7 +93,7 @@ export default function Header() {
                                             {getUserInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <span className="text-sm font-medium text-foreground">{user.name}</span>
+                                    <span className="text-sm font-semibold text-primary dark:text-orange-300 drop-shadow-sm">{user.name}</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="min-w-[200px] bg-card border-border shadow-lg">
@@ -98,9 +102,11 @@ export default function Header() {
                                     <p className="text-xs text-muted-foreground">{user.email}</p>
                                 </div>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer">
-                                    <UserIcon className="mr-2 h-4 w-4" />
-                                    Trang cá nhân
+                                <DropdownMenuItem asChild className="cursor-pointer">
+                                    <Link to="/profile" className="flex items-center">
+                                        <UserIcon className="mr-2 h-4 w-4" />
+                                        Trang cá nhân
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer">
                                     <Settings className="mr-2 h-4 w-4" />
