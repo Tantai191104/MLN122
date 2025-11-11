@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { accountService } from '@/services/accountService'
 import { Button } from '@/components/ui/button'
@@ -24,7 +25,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function Profile() {
-    const { user, setAuth, updateUser } = useAuthStore()
+    const { user, setAuth, updateUser, logout } = useAuthStore()
+    const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
     const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
     const [isChangingPassword, setIsChangingPassword] = useState(false)
@@ -91,7 +93,7 @@ export default function Profile() {
 
         if (!oldPassword || !newPassword || !confirmPassword)
             return toast.error('Vui lòng điền đầy đủ thông tin')
-        if (newPassword.length < 6) return toast.error('Mật khẩu mới phải có ít nhất 6 ký tự')
+        if (newPassword.length < 6) return toast.error('Mật khẩu mới phải có ít nhất 8 ký tự')
         if (newPassword !== confirmPassword) return toast.error('Mật khẩu xác nhận không khớp')
 
         setIsChangingPassword(true)
@@ -101,10 +103,10 @@ export default function Profile() {
                 newPassword,
                 confirmPassword,
             })
-            toast.success(response.message || 'Đổi mật khẩu thành công!')
-            setOldPassword('')
-            setNewPassword('')
-            setConfirmPassword('')
+            toast.success('Đổi mật khẩu thành công! Vui lòng đăng nhập lại.')
+            logout()
+            // Điều hướng client-side kèm state để tăng độ tin cậy hiển thị thông báo
+            navigate('/login')
         } catch (error) {
             const err = error as { response?: { data?: { message?: string } } }
             toast.error(err.response?.data?.message || 'Đổi mật khẩu thất bại')
@@ -314,7 +316,7 @@ export default function Profile() {
                             <ShieldAlert className="h-4 w-4 text-amber-600" />
                             <AlertTitle>Lưu ý bảo mật</AlertTitle>
                             <AlertDescription>
-                                Mật khẩu mới phải có ít nhất 6 ký tự và khác với mật khẩu hiện tại. Sau khi đổi mật khẩu,
+                                Mật khẩu mới phải có ít nhất 8 ký tự và khác với mật khẩu hiện tại. Sau khi đổi mật khẩu,
                                 bạn có thể cần đăng nhập lại.
                             </AlertDescription>
                         </Alert>

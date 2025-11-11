@@ -6,6 +6,7 @@ interface User {
   name: string
   email: string
   avatar?: string | null
+  role?: string | null
 }
 
 interface AuthState {
@@ -47,6 +48,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         // Xóa localStorage
         localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
         localStorage.removeItem('user')
         
         // Reset state

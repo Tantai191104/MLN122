@@ -86,6 +86,13 @@ axiosInstance.interceptors.response.use(
               originalRequest.headers.Authorization = `Bearer ${access_token}`;
             }
             return axiosInstance(originalRequest);
+          } else {
+            // Không có refresh_token => buộc đăng xuất
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("user");
+            window.location.href = "/login";
+            return Promise.reject(error);
           }
         } catch (refreshError) {
           // Refresh token thất bại, đăng xuất user

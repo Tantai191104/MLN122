@@ -237,18 +237,18 @@ export default function Chatbot() {
 
             {/* Chat Window */}
             {isOpen && (
-                <Card className="fixed bottom-6 right-6 w-96 h-[600px] shadow-3xl z-9999 flex flex-col border-4 border-primary bg-white dark:bg-card">
+                <Card className="fixed bottom-6 right-6 w-96 h-[600px] shadow-3xl z-9999 flex flex-col border border-border bg-white dark:bg-neutral-900 bg-opacity-100 backdrop-filter-none text-foreground rounded-xl">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b-2 border-primary bg-white dark:bg-card">
+                    <div className="flex items-center justify-between p-4 border-b border-border bg-white dark:bg-neutral-900 bg-opacity-100 backdrop-filter-none">
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <Avatar className="h-10 w-10 border-2 border-primary">
+                                <Avatar className="h-10 w-10 border border-border">
                                     <AvatarImage src="/ai-bot-avatar.png" alt="AI Assistant" />
                                     <AvatarFallback className="bg-linear-to-br from-primary to-orange-500 text-white">
                                         <Bot className="h-5 w-5" />
                                     </AvatarFallback>
                                 </Avatar>
-                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></span>
                             </div>
                             <div>
                                 <h3 className="font-bold text-lg text-primary dark:text-orange-400 drop-shadow">Trợ lý AI</h3>
@@ -259,26 +259,26 @@ export default function Chatbot() {
                             variant="ghost"
                             size="icon"
                             onClick={() => setIsOpen(false)}
-                            className="hover:bg-destructive/10"
+                            className="hover:bg-accent"
                         >
                             <X className="h-5 w-5" />
                         </Button>
                     </div>
 
                     {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-card">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-neutral-900 bg-opacity-100 backdrop-filter-none text-white dark:text-foreground">
                         {isLoading ? (
                             <div className="flex items-center justify-center h-full">
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </div>
                         ) : messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-center space-y-3">
-                                <div className="p-4 bg-primary/10 rounded-full">
+                                <div className="p-4 bg-muted rounded-full">
                                     <Bot className="h-12 w-12 text-primary" />
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-lg mb-2">Xin chào!</h4>
-                                    <p className="text-sm text-muted-foreground flex flex-col items-center gap-2">
+                                    <p className="text-sm text-white/80 dark:text-muted-foreground flex flex-col items-center gap-2">
                                         Tôi là trợ lý AI của MLN122.
                                         <span className="flex items-center gap-1 justify-center">
                                             Hỏi tôi về kinh tế Việt Nam nhé!
@@ -319,7 +319,7 @@ export default function Chatbot() {
                                             <div
                                                 className={`rounded-2xl px-4 py-2 ${isUser
                                                     ? 'bg-linear-to-r from-primary to-orange-500 text-white'
-                                                    : 'bg-white/90 border-2 border-primary text-foreground dark:bg-card dark:text-card-foreground'
+                                                    : 'bg-neutral-800 text-white dark:bg-muted dark:text-foreground border border-border'
                                                     }`}
                                             >
                                                 {message.mediaUrl && message.mediaType === 'image' && (
@@ -330,7 +330,7 @@ export default function Chatbot() {
                                                     />
                                                 )}
                                                 {message.content && (
-                                                    <div className={`text-sm ${isUser ? 'text-white' : 'text-foreground'}`}>
+                                                    <div className={`text-sm ${isUser ? 'text-white' : 'text-white dark:text-foreground'}`}>
                                                         {/* Format tin nhắn AI với line breaks và styling */}
                                                         {isAI ? (
                                                             <div className="space-y-2">
@@ -405,7 +405,7 @@ export default function Chatbot() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <span className="text-xs text-muted-foreground mt-1 px-1">
+                                            <span className="text-xs text-white/60 dark:text-muted-foreground mt-1 px-1">
                                                 {new Date(message.createdAt).toLocaleTimeString('vi-VN', {
                                                     hour: '2-digit',
                                                     minute: '2-digit',
@@ -433,7 +433,7 @@ export default function Chatbot() {
                                             <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                                         </div>
                                     </div>
-                                    <span className="text-xs text-muted-foreground mt-1 px-1">
+                                    <span className="text-xs text-white/60 dark:text-muted-foreground mt-1 px-1">
                                         Đang suy nghĩ...
                                     </span>
                                 </div>
@@ -446,7 +446,7 @@ export default function Chatbot() {
                     {/* Input Area */}
                     <form
                         onSubmit={handleSendMessage}
-                        className="p-4 border-t bg-background"
+                        className="p-4 border-t bg-background text-white dark:text-foreground"
                     >
                         <div className="flex gap-2">
                             <input
@@ -462,7 +462,7 @@ export default function Chatbot() {
                                 disabled={isSending}
                                 variant="outline"
                                 size="icon"
-                                className="h-11 w-11 shrink-0 border-2 hover:bg-primary/10"
+                                className="h-11 w-11 shrink-0 border-2 hover:bg-accent"
                             >
                                 <ImagePlus className="h-5 w-5" />
                             </Button>
@@ -471,7 +471,7 @@ export default function Chatbot() {
                                 onChange={(e) => setInputMessage(e.target.value)}
                                 placeholder="Nhập câu hỏi của bạn..."
                                 disabled={isSending}
-                                className="flex-1 h-11 border-2 focus:border-primary"
+                                className="flex-1 h-11 border-2 focus:border-primary text-white placeholder:text-white/60 dark:text-foreground dark:placeholder:text-muted-foreground"
                             />
                             <Button
                                 type="submit"
@@ -486,7 +486,7 @@ export default function Chatbot() {
                                 )}
                             </Button>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2 text-center">
+                        <p className="text-xs text-white/70 dark:text-muted-foreground mt-2 text-center">
                             <Bot /> Được hỗ trợ bởi AI - Có thể có sai sót
                         </p>
                     </form>

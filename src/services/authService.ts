@@ -21,6 +21,8 @@ export interface AuthResponse {
     email: string
     avatar?: string | null
     token: string
+    refresh_token?: string
+    role?: string | null
     createdAt: string
     updatedAt: string
     __v: number
@@ -32,6 +34,7 @@ export interface User {
   name: string
   email: string
   avatar?: string
+  role?: string | null
 }
 
 // Service xử lý authentication
@@ -43,11 +46,15 @@ export const authService = {
     // Lưu token và user info vào localStorage
     const { data } = response.data
     localStorage.setItem('access_token', data.token)
+    if (data.refresh_token) {
+      localStorage.setItem('refresh_token', data.refresh_token)
+    }
     localStorage.setItem('user', JSON.stringify({
       id: data._id,
       name: data.name,
       email: data.email,
-      avatar: data.avatar
+      avatar: data.avatar,
+      role: data.role ?? null
     }))
     
     return response.data
@@ -60,11 +67,15 @@ export const authService = {
     // Lưu token và user info vào localStorage
     const { data } = response.data
     localStorage.setItem('access_token', data.token)
+    if (data.refresh_token) {
+      localStorage.setItem('refresh_token', data.refresh_token)
+    }
     localStorage.setItem('user', JSON.stringify({
       id: data._id,
       name: data.name,
       email: data.email,
-      avatar: data.avatar
+      avatar: data.avatar,
+      role: data.role ?? null
     }))
     
     return response.data

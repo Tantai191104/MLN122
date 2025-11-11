@@ -19,6 +19,8 @@ export interface UpdateAccountResponse {
     email: string
     avatar?: string | null
     token: string
+    refresh_token?: string
+    role?: string | null
     createdAt: string
     updatedAt: string
     __v: number
@@ -51,11 +53,15 @@ export const accountService = {
     const { data: responseData } = response.data
     if (responseData.token) {
       localStorage.setItem('access_token', responseData.token)
+      if (responseData.refresh_token) {
+        localStorage.setItem('refresh_token', responseData.refresh_token)
+      }
       localStorage.setItem('user', JSON.stringify({
         id: responseData._id,
         name: responseData.name,
         email: responseData.email,
-        avatar: responseData.avatar
+        avatar: responseData.avatar,
+        role: responseData.role ?? null
       }))
     }
     
@@ -64,9 +70,15 @@ export const accountService = {
 
   // Đổi mật khẩu
   async changePassword(id: string, data: ChangePasswordData): Promise<ChangePasswordResponse> {
+    // API yêu cầu currentPass và newPass
+    const payload = {
+      currentPass: data.oldPassword,
+      newPass: data.newPassword,
+    }
+
     const response = await axiosInstance.put<ChangePasswordResponse>(
       `/account/change-password/${id}`,
-      data
+      payload
     )
     return response.data
   },

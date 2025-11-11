@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { useAuthStore } from "@/stores/authStore"
 import Profile from "./pages/Profile"
 import PostCreate from "./pages/PostCreate"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 export default function App() {
   const initAuth = useAuthStore((state) => state.initAuth)
@@ -45,8 +46,16 @@ export default function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/article/:id" element={<ArticleDetail />} />
                   <Route path="/about" element={<About />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/post-create" element={<PostCreate />} />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/post-create" element={
+                    <ProtectedRoute requireAdmin>
+                      <PostCreate />
+                    </ProtectedRoute>
+                  } />
                 </Routes>
               </main>
               <Footer />

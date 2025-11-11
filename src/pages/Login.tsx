@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -13,12 +13,31 @@ import { useAuthStore } from "@/stores/authStore"
 
 export default function Login() {
     const navigate = useNavigate()
+    const location = useLocation() as { state?: { postAuthMessage?: string } }
     const setAuth = useAuthStore((state) => state.setAuth)
     const [showPassword, setShowPassword] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+
+    // Hiển thị thông báo sau khi đổi mật khẩu và đăng xuất (đảm bảo chỉ 1 lần)
+    useEffect(() => {
+        const alreadyShown = sessionStorage.getItem('postAuthMessageShown')
+        if (alreadyShown === '1') return
+
+        const fromSession = sessionStorage.getItem('postAuthMessage')
+        const fromState = location.state?.postAuthMessage
+        const message = fromState || fromSession
+        if (message) {
+            // Đánh dấu đã hiển thị để tránh lặp dưới StrictMode
+            sessionStorage.setItem('postAuthMessageShown', '1')
+            // Xóa nguồn dữ liệu để không hiện lại ở lần sau
+            sessionStorage.removeItem('postAuthMessage')
+            navigate('.', { replace: true, state: {} })
+            toast.success(message)
+        }
+    }, [location.state, navigate])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
