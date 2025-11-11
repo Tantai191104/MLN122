@@ -52,7 +52,7 @@ export default function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/post-create" element={
-                    <ProtectedRoute requireAdmin>
+                    <ProtectedRoute>
                       <PostCreate />
                     </ProtectedRoute>
                   } />

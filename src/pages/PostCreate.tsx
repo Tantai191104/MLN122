@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { postNews } from '@/services/articleService'
+import type { PostNewsPayload } from '@/services/articleService'
 import { Loader2, Tag, CheckCircle2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 const TAG_OPTIONS = [
@@ -31,6 +32,7 @@ export default function PostCreate() {
     const [isPublished, setIsPublished] = useState(true)
     const [images, setImages] = useState<File[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const [author, setAuthor] = useState('')
 
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,22 +54,29 @@ export default function PostCreate() {
             toast.error('Tiêu đề và nội dung không được để trống!')
             return
         }
+        if (!author.trim()) {
+            toast.error('Vui lòng nhập tên tác giả!')
+            return
+        }
         setIsLoading(true)
         try {
-            await postNews({
+            const payload: PostNewsPayload = {
                 title,
                 summary,
                 content,
                 tags,
                 isPublished,
                 images,
-            })
+                author,
+            }
+            await postNews(payload)
             toast.success('Đăng bài thành công!')
             setTitle('')
             setSummary('')
             setContent('')
             setTags([])
             setImages([])
+            setAuthor('')
         } catch (err: unknown) {
             if (err instanceof Error) {
                 toast.error(err.message || 'Đăng bài thất bại!')
@@ -91,6 +100,10 @@ export default function PostCreate() {
                     <div>
                         <label className="font-semibold">Tóm tắt</label>
                         <Input value={summary} onChange={e => setSummary(e.target.value)} placeholder="Tóm tắt ngắn gọn" />
+                    </div>
+                    <div>
+                        <label className="font-semibold">Tác giả *</label>
+                        <Input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Tên tác giả" required />
                     </div>
                     <div>
                         <label className="font-semibold">Nội dung *</label>

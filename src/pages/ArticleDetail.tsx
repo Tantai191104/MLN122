@@ -41,7 +41,6 @@ export default function ArticleDetail() {
     axios.get(`/posts/${id}`)
       .then(res => {
         if (res.data?.success && res.data?.data) {
-          // API trả về data trực tiếp, không có .post
           setArticle(res.data.data)
         } else {
           setError("Không tìm thấy bài viết")
@@ -57,11 +56,63 @@ export default function ArticleDetail() {
     // Fetch related posts
     axios.get('/posts?page=1&limit=3')
       .then(res => {
-        const posts = res.data?.data?.posts || []
-        setRelatedPosts(posts.filter((p: Post) => p._id !== id).slice(0, 2))
+        let posts = res.data?.data?.posts || [];
+        posts = posts.filter((p: Post) => p._id !== id).slice(0, 2);
+        // Nếu không có bài viết liên quan, dùng sample
+        if (posts.length === 0) {
+          posts = [
+            {
+              _id: 'sample1',
+              title: 'Vai trò của Fintech trong nền kinh tế Việt Nam',
+              summary: 'Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp.',
+              content: '<p>Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp Việt Nam, mở ra nhiều cơ hội mới cho nền kinh tế.</p>',
+              images: ['https://images.unsplash.com/photo-1465101178521-c1a6f3b5f0a0?w=800&h=600&fit=crop'],
+              tags: ['Fintech', 'Tài chính'],
+              publishedAt: '2025-08-10',
+              userId: { _id: 'user1', name: 'Ngô Minh D', avatar: '' },
+              readTime: '6 phút đọc',
+            },
+            {
+              _id: 'sample2',
+              title: 'Khởi nghiệp đổi mới sáng tạo tại Việt Nam',
+              summary: 'Những xu hướng mới trong hệ sinh thái startup Việt Nam.',
+              content: '<p>Khởi nghiệp đổi mới sáng tạo đang là xu hướng phát triển mạnh mẽ tại Việt Nam, thu hút nhiều nguồn lực và ý tưởng mới.</p>',
+              images: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=600&fit=crop'],
+              tags: ['Startup', 'Đổi mới'],
+              publishedAt: '2025-07-22',
+              userId: { _id: 'user2', name: 'Phạm Thảo', avatar: '' },
+              readTime: '7 phút đọc',
+            },
+          ];
+        }
+        setRelatedPosts(posts);
       })
       .catch(() => {
-        // Ignore error for related posts
+        // Nếu lỗi, cũng hiển thị bài viết sample
+        setRelatedPosts([
+          {
+            _id: 'sample1',
+            title: 'Vai trò của Fintech trong nền kinh tế Việt Nam',
+            summary: 'Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp.',
+            content: '<p>Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp Việt Nam, mở ra nhiều cơ hội mới cho nền kinh tế.</p>',
+            images: ['https://images.unsplash.com/photo-1465101178521-c1a6f3b5f0a0?w=800&h=600&fit=crop'],
+            tags: ['Fintech', 'Tài chính'],
+            publishedAt: '2025-08-10',
+            userId: { _id: 'user1', name: 'Ngô Minh D', avatar: '' },
+            readTime: '6 phút đọc',
+          },
+          {
+            _id: 'sample2',
+            title: 'Khởi nghiệp đổi mới sáng tạo tại Việt Nam',
+            summary: 'Những xu hướng mới trong hệ sinh thái startup Việt Nam.',
+            content: '<p>Khởi nghiệp đổi mới sáng tạo đang là xu hướng phát triển mạnh mẽ tại Việt Nam, thu hút nhiều nguồn lực và ý tưởng mới.</p>',
+            images: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=600&fit=crop'],
+            tags: ['Startup', 'Đổi mới'],
+            publishedAt: '2025-07-22',
+            userId: { _id: 'user2', name: 'Phạm Thảo', avatar: '' },
+            readTime: '7 phút đọc',
+          },
+        ]);
       })
   }, [id])
 

@@ -1,3 +1,13 @@
+export type PostNewsPayload = {
+  title: string;
+  summary: string;
+  content: string;
+  tags?: string[];
+  isPublished?: boolean;
+  images?: File[];
+  author: string;
+};
+
 // Đăng bài tin tức kinh tế
 export async function postNews({
   title,
