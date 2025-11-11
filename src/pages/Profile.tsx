@@ -98,7 +98,7 @@ export default function Profile() {
 
         setIsChangingPassword(true)
         try {
-            const response = await accountService.changePassword(user.id, {
+            await accountService.changePassword(user.id, {
                 oldPassword,
                 newPassword,
                 confirmPassword,
