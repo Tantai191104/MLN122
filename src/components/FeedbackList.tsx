@@ -1,4 +1,3 @@
-// React import not necessary with modern JSX runtime
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
@@ -42,36 +41,44 @@ export default function FeedbackList({ feedbacks }: { feedbacks: Feedback[] }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {feedbacks.map((f) => (
-        <div key={f._id} className="p-4 rounded-lg border border-border bg-card">
-          <div className="flex items-start gap-4">
-            <Avatar className="h-10 w-10">
+        <div
+          key={f._id}
+          className="p-5 rounded-2xl border border-primary/20 bg-linear-to-br from-card via-background to-card shadow-lg hover:shadow-xl transition-all flex flex-col gap-3"
+        >
+          <div className="flex items-center gap-4">
+            <Avatar className="h-14 w-14 border-2 border-primary shadow-md">
               <AvatarImage src={f.userId?.avatar} />
-              <AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-primary text-xl">
                 {f.userId?.name ? f.userId.name.charAt(0).toUpperCase() : "U"}
               </AvatarFallback>
             </Avatar>
 
             <div className="flex-1">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-semibold text-foreground">{f.userId?.name || "Người dùng"}</p>
-                  <p className="text-xs text-muted-foreground">{f.userId?.email}</p>
-                </div>
-                <div className="text-right">
-                  {renderStars(f.rating)}
-                  <div className="text-xs text-muted-foreground">{formatDate(f.createdAt)}</div>
-                </div>
-              </div>
-
-              <div className="mt-3 text-sm text-muted-foreground">{f.comment}</div>
+              <p className="font-bold text-lg text-foreground mb-1">
+                {f.userId?.name || "Người dùng"}
+              </p>
+              <p className="text-xs text-muted-foreground">{f.userId?.email}</p>
             </div>
+
+            <div className="flex flex-col items-end min-w-20">
+              <span className="text-yellow-400 text-base font-bold cursor-pointer hover:scale-110 transition-transform">
+                {renderStars(f.rating)}
+              </span>
+              <span className="text-xs text-muted-foreground mt-1">
+                {formatDate(f.createdAt)}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-2 bg-muted/40 rounded-xl px-4 py-3 text-base text-muted-foreground font-medium shadow-sm">
+            {f.comment}
           </div>
         </div>
       ))}
 
-      <Separator />
+      <Separator className="mt-6" />
     </div>
   );
 }

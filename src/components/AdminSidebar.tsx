@@ -3,6 +3,7 @@ import { Users, Home, Info } from "lucide-react"; // Icons
 
 const adminLinks = [
     { to: "/admin", label: "Thống kê người dùng", icon: <Users className="w-5 h-5" /> },
+    { to: "/admin/review", label: "Duyệt bài viết", icon: <Info className="w-5 h-5" /> },
     { to: "/", label: "Trang chủ", icon: <Home className="w-5 h-5" /> },
     { to: "/about", label: "Giới thiệu", icon: <Info className="w-5 h-5" /> },
 ];

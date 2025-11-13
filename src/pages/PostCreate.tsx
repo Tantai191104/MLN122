@@ -8,21 +8,17 @@ import type { PostNewsPayload } from '@/services/articleService'
 import { Loader2, Tag, CheckCircle2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 const TAG_OPTIONS = [
-    'Kinh tế số',
-    'Chuyển đổi số',
-    'Bất động sản',
-    'Đầu tư',
-    'Chính sách',
-    'E-commerce',
-    'Kinh doanh',
-    'Thuế',
-    'Khởi nghiệp',
-    'Công nghệ',
-    'Nghiên cứu',
-    'Thể thao',
-    'Giải trí',
-    'Ẩm thực',
-]
+    'Quan hệ cung - cầu',
+    'Quan hệ sản xuất - tiêu dùng',
+    'Quan hệ lao động - tiền lương',
+    'Quan hệ vốn và đầu tư',
+    'Quan hệ thương mại quốc tế',
+    'Quan hệ kinh tế đối ngoại',
+    'Quan hệ giữa Nhà nước và thị trường',
+    'Quan hệ giữa doanh nghiệp và người lao động',
+    'Quan hệ giữa các ngành kinh tế',
+    'Quan hệ tài chính - ngân hàng',
+];
 
 export default function PostCreate() {
     const [title, setTitle] = useState('')
@@ -53,6 +49,12 @@ export default function PostCreate() {
         if (!title.trim() || !content.trim()) {
             toast.error('Tiêu đề và nội dung không được để trống!')
             return
+        }
+        // Validate minimum word count for content
+        const wordCount = content.trim().split(/\s+/).length;
+        if (wordCount < 500) {
+            toast.error('Nội dung bài viết phải có ít nhất 500 từ!');
+            return;
         }
         if (!author.trim()) {
             toast.error('Vui lòng nhập tên tác giả!')
@@ -89,44 +91,52 @@ export default function PostCreate() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto py-10">
-            <Card className="p-8 shadow-lg border-primary/20">
-                <h2 className="text-2xl font-bold mb-6 text-primary">Đăng bài tin tức kinh tế</h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="max-w-xl mx-auto py-10">
+            <Card className="p-8 shadow-md border border-border rounded-2xl bg-background">
+                <h2 className="text-2xl font-bold mb-8 text-primary text-center">Đăng bài mới</h2>
+                <form onSubmit={handleSubmit} className="space-y-7">
+                    <Input
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        placeholder="Tiêu đề bài viết *"
+                        required
+                        className="text-lg font-semibold mb-2"
+                    />
+                    <Input
+                        value={summary}
+                        onChange={e => setSummary(e.target.value)}
+                        placeholder="Tóm tắt ngắn gọn"
+                        className="mb-2"
+                    />
+                    <Input
+                        value={author}
+                        onChange={e => setAuthor(e.target.value)}
+                        placeholder="Tên tác giả *"
+                        required
+                        className="mb-2"
+                    />
+                    <textarea
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        rows={7}
+                        className="w-full border border-border rounded-xl p-4 text-base focus:border-primary bg-muted/40"
+                        placeholder="Nội dung chi tiết *"
+                        required
+                    />
                     <div>
-                        <label className="font-semibold">Tiêu đề *</label>
-                        <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nhập tiêu đề bài viết" required />
-                    </div>
-                    <div>
-                        <label className="font-semibold">Tóm tắt</label>
-                        <Input value={summary} onChange={e => setSummary(e.target.value)} placeholder="Tóm tắt ngắn gọn" />
-                    </div>
-                    <div>
-                        <label className="font-semibold">Tác giả *</label>
-                        <Input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Tên tác giả" required />
-                    </div>
-                    <div>
-                        <label className="font-semibold">Nội dung *</label>
-                        <textarea
-                            value={content}
-                            onChange={e => setContent(e.target.value)}
-                            rows={8}
-                            className="w-full border rounded-lg p-3 mt-1 focus:border-primary"
-                            placeholder="Nhập nội dung chi tiết..."
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="font-semibold">Tags</label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button type="button" variant="outline" className="mb-2">
-                                    <Tag className="h-5 w-5 mr-2" />Chọn tag
+                                    <Tag className="h-5 w-5 mr-2" />Chọn tag kinh tế
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-white dark:bg-card border border-primary shadow-lg">
+                            <DropdownMenuContent className="bg-background border border-border shadow-xl rounded-xl">
                                 {TAG_OPTIONS.filter(tag => !tags.includes(tag)).map((tag) => (
-                                    <DropdownMenuItem key={tag} onClick={() => setTags([...tags, tag])} className="cursor-pointer text-primary font-semibold dark:text-orange-300">
+                                    <DropdownMenuItem
+                                        key={tag}
+                                        onClick={() => setTags([...tags, tag])}
+                                        className="cursor-pointer font-semibold bg-white dark:bg-card hover:bg-primary/10 dark:hover:bg-primary/20 text-primary transition-colors"
+                                    >
                                         {tag}
                                     </DropdownMenuItem>
                                 ))}
@@ -134,9 +144,12 @@ export default function PostCreate() {
                         </DropdownMenu>
                         <div className="flex gap-2 flex-wrap mt-2">
                             {tags.map((tag, idx) => (
-                                <span key={idx} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium flex items-center gap-1">
+                                <span
+                                    key={idx}
+                                    className="px-3 py-1 bg-primary/90 hover:bg-primary text-primary-foreground rounded-xl text-xs font-semibold flex items-center gap-1 shadow-md transition-colors"
+                                >
                                     {tag}
-                                    <button type="button" className="ml-1 text-destructive" onClick={() => setTags(tags.filter((_, i) => i !== idx))}>
+                                    <button type="button" className="ml-1 text-destructive font-bold" onClick={() => setTags(tags.filter((_, i) => i !== idx))}>
                                         ×
                                     </button>
                                 </span>
@@ -144,12 +157,12 @@ export default function PostCreate() {
                         </div>
                     </div>
                     <div>
-                        <label className="font-semibold">Ảnh (tối đa 4)</label>
-                        <input type="file" accept="image/*" multiple onChange={handleImageChange} className="mt-1" />
+                        <label className="block font-medium mb-2">Ảnh (tối đa 4)</label>
+                        <Input type="file" accept="image/*" multiple onChange={handleImageChange} className="" />
                         <div className="flex gap-3 mt-2 flex-wrap">
                             {images.map((img, idx) => (
                                 <div key={idx} className="relative">
-                                    <img src={URL.createObjectURL(img)} alt="preview" className="h-20 w-20 object-cover rounded-lg border" />
+                                    <img src={URL.createObjectURL(img)} alt="preview" className="h-20 w-20 object-cover rounded-xl border border-border" />
                                     <button type="button" className="absolute top-0 right-0 bg-destructive text-white rounded-full px-2 py-0.5 text-xs" onClick={() => handleRemoveImage(idx)}>
                                         ×
                                     </button>
@@ -158,13 +171,13 @@ export default function PostCreate() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <input type="checkbox" checked={isPublished} onChange={e => setIsPublished(e.target.checked)} id="publish" />
-                        <label htmlFor="publish" className="flex items-center gap-1 cursor-pointer">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <input type="checkbox" checked={isPublished} onChange={e => setIsPublished(e.target.checked)} id="publish" className="accent-primary h-5 w-5 rounded" />
+                        <label htmlFor="publish" className="flex items-center gap-1 cursor-pointer text-base font-medium">
+                            <CheckCircle2 className="h-5 w-5 text-green-600" />
                             Xuất bản ngay
                         </label>
                     </div>
-                    <Button type="submit" className="w-full bg-linear-to-r from-primary to-orange-500 text-white font-bold text-lg" disabled={isLoading}>
+                    <Button type="submit" className="w-full bg-linear-to-r from-primary to-orange-500 text-white font-bold text-lg rounded-xl py-3" disabled={isLoading}>
                         {isLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : 'Đăng bài'}
                     </Button>
                 </form>

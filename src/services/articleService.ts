@@ -1,3 +1,5 @@
+// ...existing code...
+
 export type PostNewsPayload = {
   title: string;
   summary: string;
@@ -96,6 +98,11 @@ export interface ArticleFilters {
 
 // Service xử lý articles
 export const articleService = {
+  // Lấy các bài viết chờ duyệt cho admin
+  async getPendingModerationPosts(params?: { page?: number; limit?: number }) {
+    const response = await axiosInstance.get(`/posts/moderation`, { params });
+    return response.data;
+  },
   // Lấy danh sách articles
   async getArticles(filters?: ArticleFilters): Promise<ArticleListResponse> {
     const response = await axiosInstance.get<ArticleListResponse>("/articles", {
@@ -106,7 +113,7 @@ export const articleService = {
 
   // Lấy chi tiết article
   async getArticleById(id: string): Promise<Article> {
-    const response = await axiosInstance.get<Article>(`/articles/${id}`);
+    const response = await axiosInstance.get<Article>(`/posts/${id}`);
     return response.data;
   },
 
@@ -160,7 +167,9 @@ export const articleService = {
 
   // Lấy feedbacks (phản hồi) cho một bài viết
   async getFeedbacks(articleId: string): Promise<Feedback[]> {
-    const response = await axiosInstance.get<Feedback[]>(`/posts/${articleId}/feedbacks`);
+    const response = await axiosInstance.get<Feedback[]>(
+      `/posts/${articleId}/feedbacks`
+    );
     return response.data;
   },
   // Lấy một post theo id (endpoint /posts/{id})
@@ -171,18 +180,41 @@ export const articleService = {
 
   // Lấy các posts liên quan (dùng endpoint /posts với paging, filter by exclude id)
   async getRelatedPosts(limit = 3) {
-    const response = await axiosInstance.get(`/posts`, { params: { page: 1, limit } });
+    const response = await axiosInstance.get(`/posts`, {
+      params: { page: 1, limit },
+    });
     return response.data;
   },
 
   // Gửi feedback cho một post
-  async postFeedback(postId: string, payload: { comment: string; rating: number }) {
-    const response = await axiosInstance.post(`/posts/${postId}/feedback`, payload);
+  async postFeedback(
+    postId: string,
+    payload: { comment: string; rating: number }
+  ) {
+    const response = await axiosInstance.post(
+      `/posts/${postId}/feedback`,
+      payload
+    );
     return response.data;
   },
   // Lấy posts từ endpoint /posts (dùng cho backend hiện tại)
-  async getPosts(params?: { page?: number; limit?: number; category?: string }) {
+  async getPosts(params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+  }) {
     const response = await axiosInstance.get(`/posts`, { params });
+    return response.data;
+  },
+  // Admin review post (approve/reject)
+  async reviewPost(
+    postId: string,
+    payload: { action: "approve" | "reject"; rejectionReason?: string }
+  ) {
+    const response = await axiosInstance.post(
+      `/posts/${postId}/review`,
+      payload
+    );
     return response.data;
   },
 };

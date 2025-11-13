@@ -10,6 +10,8 @@ import Login from "@/pages/Login"
 import Register from "@/pages/Register"
 import AdminLayout from "@/pages/AdminLayout"
 import AdminDashboard from "@/pages/AdminDashboard"
+import AdminReview from "@/pages/AdminReview";
+
 
 import { ThemeProvider } from "./contexts/ThemeProvider"
 import { Toaster } from "@/components/ui/sonner"
@@ -36,6 +38,7 @@ export default function App() {
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="review" element={<AdminReview />} />
           </Route>
           {/* Main Routes - With Header/Footer */}
           <Route path="/*" element={
