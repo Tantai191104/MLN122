@@ -62,6 +62,21 @@ export interface Article {
   views: number;
 }
 
+export interface FeedbackUser {
+  _id: string;
+  name?: string;
+  email?: string;
+  avatar?: string;
+}
+
+export interface Feedback {
+  _id: string;
+  userId: FeedbackUser;
+  comment: string;
+  rating: number;
+  createdAt: string;
+}
+
 export interface ArticleListResponse {
   articles: Article[];
   total: number;
@@ -140,6 +155,34 @@ export const articleService = {
         params: { limit },
       }
     );
+    return response.data;
+  },
+
+  // Lấy feedbacks (phản hồi) cho một bài viết
+  async getFeedbacks(articleId: string): Promise<Feedback[]> {
+    const response = await axiosInstance.get<Feedback[]>(`/posts/${articleId}/feedbacks`);
+    return response.data;
+  },
+  // Lấy một post theo id (endpoint /posts/{id})
+  async getPostById(postId: string) {
+    const response = await axiosInstance.get(`/posts/${postId}`);
+    return response.data;
+  },
+
+  // Lấy các posts liên quan (dùng endpoint /posts với paging, filter by exclude id)
+  async getRelatedPosts(limit = 3) {
+    const response = await axiosInstance.get(`/posts`, { params: { page: 1, limit } });
+    return response.data;
+  },
+
+  // Gửi feedback cho một post
+  async postFeedback(postId: string, payload: { comment: string; rating: number }) {
+    const response = await axiosInstance.post(`/posts/${postId}/feedback`, payload);
+    return response.data;
+  },
+  // Lấy posts từ endpoint /posts (dùng cho backend hiện tại)
+  async getPosts(params?: { page?: number; limit?: number; category?: string }) {
+    const response = await axiosInstance.get(`/posts`, { params });
     return response.data;
   },
 };

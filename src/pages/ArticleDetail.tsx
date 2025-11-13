@@ -6,7 +6,13 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ArrowLeft, Clock, Calendar, Share2, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
-import axios from "@/lib/axios"
+import FeedbackList from "@/components/FeedbackList"
+import type { Feedback as FeedbackType } from "@/components/FeedbackList"
+import { articleService } from "@/services/articleService"
+import { useAuthStore } from "@/stores/authStore"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
+// Input not used here
+import { toast } from "sonner"
 
 interface Post {
   _id: string;
@@ -33,88 +39,140 @@ export default function ArticleDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([])
+  const [feedbacks, setFeedbacks] = useState<FeedbackType[]>([])
+  const [feedbackLoading, setFeedbackLoading] = useState(true)
+  const [feedbackError, setFeedbackError] = useState("")
+  const [refetchingFeedbacks, setRefetchingFeedbacks] = useState(false)
 
   useEffect(() => {
     if (!id) return;
-
-    // Fetch article detail
-    axios.get(`/posts/${id}`)
-      .then(res => {
-        if (res.data?.success && res.data?.data) {
-          setArticle(res.data.data)
+    // Fetch article detail using service
+    setLoading(true)
+    articleService
+      .getPostById(id)
+      .then((res) => {
+        // response may be { success, data } or raw object
+        const payload = res?.data || res
+        if (payload && (payload.success ? payload.data : payload)) {
+          const data = payload.success ? payload.data : payload
+          setArticle(data)
         } else {
           setError("Không tìm thấy bài viết")
         }
       })
-      .catch(() => {
-        setError("Không thể tải bài viết")
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+      .catch(() => setError("Không thể tải bài viết"))
+      .finally(() => setLoading(false))
 
-    // Fetch related posts
-    axios.get('/posts?page=1&limit=3')
-      .then(res => {
-        let posts = res.data?.data?.posts || [];
-        posts = posts.filter((p: Post) => p._id !== id).slice(0, 2);
-        // Nếu không có bài viết liên quan, dùng sample
-        if (posts.length === 0) {
-          posts = [
-            {
-              _id: 'sample1',
-              title: 'Vai trò của Fintech trong nền kinh tế Việt Nam',
-              summary: 'Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp.',
-              content: '<p>Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp Việt Nam, mở ra nhiều cơ hội mới cho nền kinh tế.</p>',
-              images: ['https://images.unsplash.com/photo-1465101178521-c1a6f3b5f0a0?w=800&h=600&fit=crop'],
-              tags: ['Fintech', 'Tài chính'],
-              publishedAt: '2025-08-10',
-              userId: { _id: 'user1', name: 'Ngô Minh D', avatar: '' },
-              readTime: '6 phút đọc',
-            },
-            {
-              _id: 'sample2',
-              title: 'Khởi nghiệp đổi mới sáng tạo tại Việt Nam',
-              summary: 'Những xu hướng mới trong hệ sinh thái startup Việt Nam.',
-              content: '<p>Khởi nghiệp đổi mới sáng tạo đang là xu hướng phát triển mạnh mẽ tại Việt Nam, thu hút nhiều nguồn lực và ý tưởng mới.</p>',
-              images: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=600&fit=crop'],
-              tags: ['Startup', 'Đổi mới'],
-              publishedAt: '2025-07-22',
-              userId: { _id: 'user2', name: 'Phạm Thảo', avatar: '' },
-              readTime: '7 phút đọc',
-            },
-          ];
-        }
-        setRelatedPosts(posts);
+    // Fetch related posts (use service, don't inject hardcoded samples)
+    articleService
+      .getRelatedPosts(3)
+      .then((res) => {
+        const payload = res?.data || res
+        const loaded = payload?.posts || (Array.isArray(payload) ? payload : [])
+        const filtered = loaded.filter((p: Post) => p._id !== id).slice(0, 2)
+        setRelatedPosts(filtered)
       })
       .catch(() => {
-        // Nếu lỗi, cũng hiển thị bài viết sample
-        setRelatedPosts([
-          {
-            _id: 'sample1',
-            title: 'Vai trò của Fintech trong nền kinh tế Việt Nam',
-            summary: 'Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp.',
-            content: '<p>Fintech đang thay đổi cách tiếp cận tài chính của người dân và doanh nghiệp Việt Nam, mở ra nhiều cơ hội mới cho nền kinh tế.</p>',
-            images: ['https://images.unsplash.com/photo-1465101178521-c1a6f3b5f0a0?w=800&h=600&fit=crop'],
-            tags: ['Fintech', 'Tài chính'],
-            publishedAt: '2025-08-10',
-            userId: { _id: 'user1', name: 'Ngô Minh D', avatar: '' },
-            readTime: '6 phút đọc',
-          },
-          {
-            _id: 'sample2',
-            title: 'Khởi nghiệp đổi mới sáng tạo tại Việt Nam',
-            summary: 'Những xu hướng mới trong hệ sinh thái startup Việt Nam.',
-            content: '<p>Khởi nghiệp đổi mới sáng tạo đang là xu hướng phát triển mạnh mẽ tại Việt Nam, thu hút nhiều nguồn lực và ý tưởng mới.</p>',
-            images: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=800&h=600&fit=crop'],
-            tags: ['Startup', 'Đổi mới'],
-            publishedAt: '2025-07-22',
-            userId: { _id: 'user2', name: 'Phạm Thảo', avatar: '' },
-            readTime: '7 phút đọc',
-          },
-        ]);
+        // on error, leave relatedPosts empty
+        setRelatedPosts([])
       })
+    // Fetch feedbacks for this post via service
+    setFeedbackLoading(true)
+    articleService
+      .getFeedbacks(id)
+      .then((res) => {
+        const payload = res as unknown
+        if (Array.isArray(payload)) {
+          setFeedbacks(payload as FeedbackType[])
+        } else if (typeof payload === "object" && payload !== null) {
+          const obj = payload as Record<string, unknown>
+          if (obj["success"] === true && Array.isArray(obj["data"])) {
+            setFeedbacks(obj["data"] as FeedbackType[])
+          } else if (Array.isArray(obj["data"])) {
+            setFeedbacks(obj["data"] as FeedbackType[])
+          } else {
+            setFeedbacks([])
+          }
+        } else {
+          setFeedbacks([])
+        }
+      })
+      .catch(() => {
+        setFeedbackError("Không thể tải phản hồi")
+        setFeedbacks([])
+      })
+      .finally(() => setFeedbackLoading(false))
   }, [id])
+
+  // feedback form state
+  const [newComment, setNewComment] = useState("")
+  const [newRating, setNewRating] = useState<number>(5)
+  const [submitLoading, setSubmitLoading] = useState(false)
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+  const COMMENT_MAX = 500
+
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!id) return
+    const trimmed = newComment.trim()
+    if (!trimmed) {
+      toast.error("Vui lòng nhập nội dung phản hồi")
+      return
+    }
+    if (trimmed.length > COMMENT_MAX) {
+      toast.error(`Phản hồi dài quá, tối đa ${COMMENT_MAX} ký tự`)
+      return
+    }
+    if (!isAuthenticated) {
+      toast.error("Bạn cần đăng nhập để gửi phản hồi")
+      return
+    }
+    // optimistic update: show the feedback immediately for snappier UX
+    const authUser = useAuthStore.getState().user as unknown as { id?: string; _id?: string; name?: string; email?: string; avatar?: string } | null
+    const tempFeedback: FeedbackType = {
+      _id: `temp-${Date.now()}`,
+      userId: {
+        _id: authUser?.id ?? authUser?._id ?? 'anon',
+        name: authUser?.name ?? 'Bạn',
+        email: authUser?.email ?? undefined,
+        avatar: authUser?.avatar ?? undefined,
+      },
+      comment: trimmed,
+      rating: newRating,
+      createdAt: new Date().toISOString(),
+    }
+
+    setFeedbacks(prev => [tempFeedback, ...prev])
+    setSubmitLoading(true)
+    try {
+      // send to server in background
+      await articleService.postFeedback(id, { comment: trimmed, rating: newRating })
+      toast.success("Gửi phản hồi thành công")
+    } catch {
+      toast.error("Gửi phản hồi thất bại")
+    } finally {
+      setSubmitLoading(false)
+      setRefetchingFeedbacks(true)
+      try {
+        const latest = await articleService.getFeedbacks(id)
+        if (Array.isArray(latest)) setFeedbacks(latest as FeedbackType[])
+        else if (typeof latest === "object" && latest !== null) {
+          const obj = latest as Record<string, unknown>
+          if (Array.isArray(obj["data"])) setFeedbacks(obj["data"] as FeedbackType[])
+          else setFeedbacks([])
+        } else {
+          setFeedbacks([])
+        }
+        setNewComment("")
+        setNewRating(5)
+      } catch {
+        // if refetch fails, keep optimistic state but show an error
+        toast.error("Không thể đồng bộ phản hồi từ máy chủ")
+      } finally {
+        setRefetchingFeedbacks(false)
+      }
+    }
+  }
 
   // Loading state
   if (loading) {
@@ -295,6 +353,68 @@ export default function ArticleDetail() {
           </div>
         </div>
       )}
+
+      {/* Feedbacks */}
+      <div className="mt-16 space-y-6">
+        <h3 className="text-2xl font-bold">Phản hồi của độc giả</h3>
+
+        {/* Feedback form */}
+        <Card className="p-4">
+          <CardTitle className="text-lg font-semibold mb-2">Gửi phản hồi</CardTitle>
+          <CardContent>
+            <form onSubmit={handleSubmitFeedback} className="space-y-3">
+              <div>
+                <label className="text-sm font-medium">Nội dung</label>
+                <textarea
+                  value={newComment}
+                  onChange={e => setNewComment(e.target.value)}
+                  rows={4}
+                  maxLength={COMMENT_MAX}
+                  className="w-full border rounded-md p-2 mt-1 focus:border-primary"
+                  placeholder="Viết phản hồi của bạn ở đây..."
+                  disabled={!isAuthenticated || submitLoading}
+                />
+                <div className="flex justify-between text-sm mt-1">
+                  <div className="text-destructive/80">{newComment.trim().length > COMMENT_MAX ? 'Quá giới hạn ký tự' : ''}</div>
+                  <div className={"text-sm " + (newComment.length >= COMMENT_MAX ? 'text-destructive' : 'text-muted-foreground')}>{newComment.length}/{COMMENT_MAX}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium">Đánh giá</label>
+                <select value={String(newRating)} onChange={e => setNewRating(Number(e.target.value))} className="h-9 px-2 rounded-md border" disabled={!isAuthenticated || submitLoading}>
+                  <option value="5">5 - Xuất sắc</option>
+                  <option value="4">4 - Tốt</option>
+                  <option value="3">3 - Trung bình</option>
+                  <option value="2">2 - Kém</option>
+                  <option value="1">1 - Rất kém</option>
+                </select>
+                <div className="flex-1 text-right">
+                  <Button type="submit" disabled={submitLoading || !isAuthenticated || newComment.trim().length === 0} className="bg-primary">
+                    {submitLoading ? 'Đang gửi...' : 'Gửi phản hồi'}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+        {!isAuthenticated && (
+          <div className="text-sm text-muted-foreground">Vui lòng <Link to="/login" className="text-primary underline">đăng nhập</Link> để gửi phản hồi.</div>
+        )}
+
+        {(feedbackLoading || refetchingFeedbacks) ? (
+          <div className="space-y-3">
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+          </div>
+        ) : feedbackError ? (
+          <p className="text-sm text-destructive">{feedbackError}</p>
+        ) : feedbacks.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Chưa có phản hồi nào.</p>
+        ) : (
+          <FeedbackList feedbacks={feedbacks} />
+        )}
+      </div>
 
       {/* Related Articles */}
       {relatedPosts.length > 0 && (
