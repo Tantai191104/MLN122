@@ -5,30 +5,6 @@ import { Facebook, Twitter, Youtube, Mail } from "lucide-react"
 export default function Footer() {
   return (
     <footer className="bg-linear-to-b from-background to-muted/20 mt-20">
-      {/* Newsletter Section */}
-      <div className="border-b border-border/50 bg-linear-to-b from-primary/5 to-background">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="max-w-xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-              Nhận tin tức mới nhất
-            </h3>
-            <p className="text-muted-foreground mb-8 text-base leading-relaxed">
-              Đăng ký nhận bản tin hàng tuần về kinh tế Việt Nam và phân tích chuyên sâu
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                placeholder="Email của bạn..."
-                className="flex-1 px-5 py-3.5 rounded-xl border-2 border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-md hover:shadow-lg"
-              />
-              <button className="bg-primary text-primary-foreground font-semibold px-8 py-3.5 rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] whitespace-nowrap active:scale-95">
-                Đăng ký ngay
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Content */}
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">

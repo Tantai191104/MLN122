@@ -23,7 +23,9 @@ import { toast } from "sonner";
 export default function Header() {
     const { setTheme } = useTheme();
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout } = useAuthStore();
+    const user = useAuthStore((state) => state.user);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const logout = useAuthStore((state) => state.logout);
 
     const handleLogout = () => {
         logout();
@@ -84,12 +86,14 @@ export default function Header() {
                     >
                         Đăng bài
                     </Link>
-                    <Link
-                        className="px-4 py-2 text-sm text-blue-700 dark:text-blue-300 hover:text-white hover:bg-linear-to-r hover:from-blue-500 hover:to-indigo-500 rounded-lg transition-all font-semibold"
-                        to="/admin"
-                    >
-                        Quản lý
-                    </Link>
+                    {user?.role === 'admin' && (
+                        <Link
+                            className="px-4 py-2 text-sm text-blue-700 dark:text-blue-300 hover:text-white hover:bg-linear-to-r hover:from-blue-500 hover:to-indigo-500 rounded-lg transition-all font-semibold"
+                            to="/admin"
+                        >
+                            Quản lý
+                        </Link>
+                    )}
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

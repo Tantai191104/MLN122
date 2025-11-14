@@ -49,6 +49,33 @@ export default function ArticleCard({ id, title, excerpt, date, tags, author = "
                         </Link>
                     </CardTitle>
 
+                    {/* Tags */}
+                    {tags && tags.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                            {tags.slice(0, 3).map((tag, index) => (
+                                <Badge 
+                                    key={tag} 
+                                    variant="secondary" 
+                                    className={`text-xs font-medium border shadow-sm ${
+                                        index === 0 
+                                            ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20' 
+                                            : 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 hover:bg-purple-500/20'
+                                    }`}
+                                >
+                                    {tag}
+                                </Badge>
+                            ))}
+                            {tags.length > 3 && (
+                                <Badge 
+                                    variant="secondary" 
+                                    className="text-xs font-medium border shadow-sm bg-muted text-muted-foreground"
+                                >
+                                    +{tags.length - 3}
+                                </Badge>
+                            )}
+                        </div>
+                    )}
+
                     <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed mb-4 flex-1">{excerpt}</p>
 
                     <Link to={`/article/${id}`} className="inline-flex items-center text-primary font-semibold text-sm hover:gap-2 transition-all">
@@ -60,7 +87,7 @@ export default function ArticleCard({ id, title, excerpt, date, tags, author = "
     }
 
     return (
-        <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border hover:border-primary/30 overflow-hidden">
+        <Card className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border hover:border-primary/30 overflow-hidden h-full flex flex-col">
             <div className="h-2 bg-linear-to-r from-primary via-primary/70 to-primary/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <CardHeader className="space-y-3 pb-4">
                 <div className="flex items-center gap-3">
@@ -105,11 +132,11 @@ export default function ArticleCard({ id, title, excerpt, date, tags, author = "
                 )}
             </CardHeader>
 
-            <CardContent className="pb-4">
+            <CardContent className="pb-4 flex-1">
                 <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{excerpt}</p>
             </CardContent>
 
-            <CardFooter className="pt-0 border-t border-border/50">
+            <CardFooter className="pt-0 border-t border-border/50 mt-auto">
                 <Button variant="ghost" asChild className="w-full justify-between text-primary font-semibold group/btn hover:bg-primary/5">
                     <Link to={`/article/${id}`} className="flex items-center gap-2">
                         <span>Đọc tiếp</span>

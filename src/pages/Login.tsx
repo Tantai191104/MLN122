@@ -56,7 +56,8 @@ export default function Login() {
                     id: response.data._id,
                     name: response.data.name,
                     email: response.data.email,
-                    avatar: response.data.avatar
+                    avatar: response.data.avatar,
+                    role: response.data.role ?? null
                 },
                 response.data.token
             )

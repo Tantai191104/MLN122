@@ -18,6 +18,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { useAuthStore } from "@/stores/authStore"
 import Profile from "./pages/Profile"
 import PostCreate from "./pages/PostCreate"
+import AllPosts from "./pages/AllPosts"
 import ProtectedRoute from "./components/ProtectedRoute"
 
 export default function App() {
@@ -36,7 +37,11 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           {/* Admin Routes */}
-          <Route path="/admin/*" element={<AdminLayout />}>
+          <Route path="/admin/*" element={
+            <ProtectedRoute requireAdmin={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
             <Route index element={<AdminDashboard />} />
             <Route path="review" element={<AdminReview />} />
           </Route>
@@ -47,6 +52,7 @@ export default function App() {
               <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/posts" element={<AllPosts />} />
                   <Route path="/article/:id" element={<ArticleDetail />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/profile" element={

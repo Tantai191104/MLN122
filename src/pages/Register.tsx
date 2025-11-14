@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Mail, Lock, User, TrendingUp, BarChart3, Newspaper } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, TrendingUp, Newspaper } from "lucide-react"
 import { AiOutlineLoading3Quarters } from "react-icons/ai"
 import { authService } from "@/services/authService"
 import { toast } from "sonner"
@@ -118,16 +118,6 @@ export default function Register() {
                             <div>
                                 <h3 className="font-semibold text-lg mb-1">Nội dung độc quyền</h3>
                                 <p className="text-white/80 text-sm">Truy cập các báo cáo và phân tích chuyên sâu</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/15 transition-all">
-                            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
-                                <BarChart3 className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-lg mb-1">Cá nhân hóa nội dung</h3>
-                                <p className="text-white/80 text-sm">Nhận tin tức phù hợp với sở thích của bạn</p>
                             </div>
                         </div>
 

@@ -125,7 +125,7 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-            <section className="space-y-6">
+            {/* <section className="space-y-6">
                 <div className="text-center">
                     <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Tất cả bài viết</h1>
                     <p className="text-muted-foreground mt-2">Khám phá các bài viết mới nhất từ cộng đồng</p>
@@ -151,14 +151,14 @@ export default function Home() {
                         />
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Popular Articles Section */}
             <section className="space-y-4">
                 <h2 className="text-xl font-bold text-primary">Bài viết mới đăng</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {popularArticles.map((a) => (
-                        <div key={a._id} className="relative">
+                        <div key={a._id} className="relative h-full">
                             <div className="absolute top-3 right-3 z-10">
                                 <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">Nổi bật</span>
                             </div>
@@ -187,8 +187,8 @@ export default function Home() {
                 ) : visibleArticles.length > 0 ? (
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {visibleArticles.map((a) => (
-                            <ArticleCard
-                                key={a._id || 'unknown'}
+                            <div key={a._id || 'unknown'} className="h-full">
+                                <ArticleCard
                                 id={a._id || 'unknown'}
                                 title={a.title || 'Không có tiêu đề'}
                                 excerpt={a.summary || a.excerpt || 'Không có mô tả'}
@@ -200,18 +200,10 @@ export default function Home() {
                                 image={a.images && a.images.length > 0 ? a.images[0] : 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop'}
                                 compact
                             />
+                            </div>
                         ))}
                     </div>
-                ) : posts.length === 0 ? (
-                    <div className="text-center py-16 bg-muted/30 rounded-xl border-2 border-dashed">
-                        <p className="text-muted-foreground text-lg">Chưa có bài viết nào</p>
-                    </div>
-                ) : (
-                    <div className="text-center py-16 bg-muted/30 rounded-xl border-2 border-dashed">
-                        <p className="text-muted-foreground text-lg">Không tìm thấy bài viết nào phù hợp</p>
-                        <p className="text-muted-foreground text-sm mt-2">Thử thay đổi từ khóa tìm kiếm hoặc chọn danh mục khác</p>
-                    </div>
-                )}
+                ) : null}
             </section>
 
             {/* Pagination */}
@@ -239,7 +231,7 @@ export default function Home() {
             <section className="space-y-6 py-8">
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl md:text-3xl font-bold">Bài viết phổ biến</h2>
-                    <Link to="/about">
+                    <Link to="/posts">
                         <button className="bg-primary text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-primary/90 transition-all shadow-md hover:shadow-lg">
                             Xem tất cả
                         </button>

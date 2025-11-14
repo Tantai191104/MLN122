@@ -197,11 +197,20 @@ export const articleService = {
     );
     return response.data;
   },
+
+  // Xóa feedback của một post
+  async deleteFeedback(postId: string, feedbackId: string) {
+    const response = await axiosInstance.delete(
+      `/posts/${postId}/feedback/${feedbackId}`
+    );
+    return response.data;
+  },
   // Lấy posts từ endpoint /posts (dùng cho backend hiện tại)
   async getPosts(params?: {
     page?: number;
     limit?: number;
     category?: string;
+    search?: string;
   }) {
     const response = await axiosInstance.get(`/posts`, { params });
     return response.data;

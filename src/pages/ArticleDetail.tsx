@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, AlertCircle } from "lucide-react"
+import { ArrowLeft, AlertCircle, AlertTriangle, Loader2, X } from "lucide-react"
 import FeedbackList from "@/components/FeedbackList"
 import type { Feedback as FeedbackType } from "@/components/FeedbackList"
 import { articleService } from "@/services/articleService"
@@ -14,7 +14,6 @@ import { toast } from "sonner" // nếu bạn dùng thư viện khác, thay th�
 import ArticleHeader from "@/components/ArticleHeader"
 import ArticleImage from "@/components/ArticleImage"
 import ArticleContent from "@/components/ArticleContent"
-import ArticleAuthor from "@/components/ArticleAuthor"
 import type { Post } from "@/types/article"
 
 // Post type imported from @/types/article
@@ -33,7 +32,11 @@ export default function ArticleDetail() {
   const [newComment, setNewComment] = useState("")
   const [newRating, setNewRating] = useState<number>(5)
   const [submitLoading, setSubmitLoading] = useState(false)
+  const [deletingFeedbackId, setDeletingFeedbackId] = useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [feedbackToDelete, setFeedbackToDelete] = useState<string | null>(null)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const user = useAuthStore((state) => state.user)
   const COMMENT_MAX = 500
 
   useEffect(() => {
@@ -144,6 +147,37 @@ export default function ArticleDetail() {
     }
   }
 
+  const handleDeleteClick = (feedbackId: string) => {
+    setFeedbackToDelete(feedbackId)
+    setShowDeleteDialog(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!id || !feedbackToDelete) return
+
+    setDeletingFeedbackId(feedbackToDelete)
+    setShowDeleteDialog(false)
+    
+    try {
+      await articleService.deleteFeedback(id, feedbackToDelete)
+      toast.success("Xóa phản hồi thành công")
+      
+      // Remove feedback from list immediately
+      setFeedbacks((prev) => prev.filter((f) => f._id !== feedbackToDelete))
+    } catch (err) {
+      console.error("Error deleting feedback:", err)
+      toast.error("Xóa phản hồi thất bại")
+    } finally {
+      setDeletingFeedbackId(null)
+      setFeedbackToDelete(null)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false)
+    setFeedbackToDelete(null)
+  }
+
   // Loading UI
   if (loading) {
     return (
@@ -193,7 +227,6 @@ export default function ArticleDetail() {
       <Separator className="mb-10" />
       {post && <ArticleContent content={post.content} />}
       <Separator className="my-10" />
-      {post?.userId && <ArticleAuthor userId={post.userId} />}
 
       {/* Feedback */}
       <div className="mt-16 space-y-6">
@@ -282,9 +315,79 @@ export default function ArticleDetail() {
         ) : feedbacks.length === 0 ? (
           <p className="text-sm text-muted-foreground">Chưa có phản hồi nào.</p>
         ) : (
-          <FeedbackList feedbacks={feedbacks} />
+          <FeedbackList 
+            feedbacks={feedbacks} 
+            currentUserId={user?.id || null}
+            onDelete={handleDeleteClick}
+            isDeleting={deletingFeedbackId !== null}
+          />
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={handleCancelDelete}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 animate-in fade-in-0 zoom-in-95 duration-200">
+            {/* Close Button */}
+            <button
+              onClick={handleCancelDelete}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              disabled={deletingFeedbackId !== null}
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Xác nhận xóa phản hồi
+                </h3>
+                <p className="text-base text-gray-600 dark:text-gray-300">
+                  Bạn có chắc chắn muốn xóa phản hồi này? Hành động này không thể hoàn tác.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={handleCancelDelete}
+                disabled={deletingFeedbackId !== null}
+                className="min-w-[100px] text-white border-white/30 hover:bg-white/10 hover:text-white"
+              >
+                Hủy
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={deletingFeedbackId !== null}
+                className="min-w-[100px] text-white bg-red-600 hover:bg-red-700"
+              >
+                {deletingFeedbackId ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Đang xóa...
+                  </>
+                ) : (
+                  "Xóa"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bài viết liên quan */}
       {relatedPosts.length > 0 && (
