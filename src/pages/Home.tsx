@@ -125,7 +125,7 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-            {/* <section className="space-y-6">
+            <section className="space-y-6">
                 <div className="text-center">
                     <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Tất cả bài viết</h1>
                     <p className="text-muted-foreground mt-2">Khám phá các bài viết mới nhất từ cộng đồng</p>
@@ -151,7 +151,7 @@ export default function Home() {
                         />
                     </div>
                 </div>
-            </section> */}
+            </section>
 
             {/* Popular Articles Section */}
             <section className="space-y-4">
