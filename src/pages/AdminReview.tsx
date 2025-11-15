@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { articleService } from "@/services/articleService";
+import { Link } from "react-router-dom";
 import type { Post as BasePost } from "@/types/article";
 
 type Post = BasePost & {
@@ -121,6 +122,11 @@ export default function AdminReview() {
                                     </div>
                                 </TableCell>
                                 <TableCell className="flex gap-2 justify-center">
+                                    <Link to={`/article/${post._id}`} target="_blank" rel="noopener noreferrer">
+                                        <Button variant="outline" size="sm" className="mr-2">
+                                            Chi tiết
+                                        </Button>
+                                    </Link>
                                     <Button
                                         variant="default"
                                         size="sm"
