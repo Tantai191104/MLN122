@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+// Using a simple inline modal instead of the Dialog component
 import { articleService } from "@/services/articleService";
 import { Link } from "react-router-dom";
 import type { Post as BasePost } from "@/types/article";
@@ -15,10 +15,31 @@ type Post = BasePost & {
 
 function getAuthorName(post: Post): string {
     if (!post) return "Ẩn danh";
-    if (typeof post.author === "string") return post.author;
-    if (post.author && typeof post.author === "object" && "name" in post.author && typeof post.author.name === "string") return post.author.name;
-    if (typeof post.createdBy === "string") return post.createdBy;
-    if (post.createdBy && typeof post.createdBy === "object" && "name" in post.createdBy && typeof post.createdBy.name === "string") return post.createdBy.name;
+    // Prefer userId (common backend shape), support string or object with name
+    const userIdField = (post as unknown as { userId?: unknown }).userId
+    if (userIdField) {
+        if (typeof userIdField === 'string') return userIdField
+        if (typeof userIdField === 'object' && userIdField !== null) {
+            const name = (userIdField as { name?: unknown }).name
+            if (typeof name === 'string') return name
+        }
+    }
+
+    // Fallback to 'author' field which might be string or object
+    const authorField = (post as unknown as { author?: unknown }).author
+    if (typeof authorField === 'string') return authorField
+    if (typeof authorField === 'object' && authorField !== null) {
+        const name = (authorField as { name?: unknown }).name
+        if (typeof name === 'string') return name
+    }
+
+    // Fallback to createdBy
+    const createdByField = (post as unknown as { createdBy?: unknown }).createdBy
+    if (typeof createdByField === 'string') return createdByField
+    if (typeof createdByField === 'object' && createdByField !== null) {
+        const name = (createdByField as { name?: unknown }).name
+        if (typeof name === 'string') return name
+    }
     return "Ẩn danh";
 }
 
@@ -151,39 +172,56 @@ export default function AdminReview() {
                     </TableBody>
                 </Table>
             )}
-            {/* Dialog for rejection reason */}
-            <Dialog open={!!rejectingPost} onOpenChange={(open) => !open && setRejectingPost(null)}>
-                <DialogContent className="max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle>Từ chối bài viết</DialogTitle>
-                    </DialogHeader>
-                    <div className="mb-2 text-base font-semibold text-primary">{rejectingPost?.title}</div>
-                    <div className="mb-4 text-sm text-muted-foreground">Tác giả: {rejectingPost && getAuthorName(rejectingPost)}</div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Lý do từ chối <span className="text-destructive">*</span></label>
-                        <input
-                            type="text"
-                            value={rejectionReason}
-                            onChange={(e) => setRejectionReason(e.target.value)}
-                            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary"
-                            disabled={reviewing}
-                            placeholder="Nhập lý do từ chối bài viết"
-                        />
+            {/* Modal for rejection reason (simple inline modal) */}
+            {rejectingPost && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/25 backdrop-blur-sm" onClick={() => setRejectingPost(null)} />
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        className="relative z-50 max-w-lg w-full bg-card rounded-lg shadow-2xl p-6 mx-4 ring-1 ring-border"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <h3 className="text-lg font-semibold">Từ chối bài viết</h3>
+                            <button
+                                aria-label="Đóng"
+                                onClick={() => setRejectingPost(null)}
+                                className="text-muted-foreground hover:text-foreground"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="mb-2 text-base font-semibold text-primary">{rejectingPost?.title}</div>
+                        <div className="mb-4 text-sm text-muted-foreground">Tác giả: {rejectingPost && getAuthorName(rejectingPost)}</div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">Lý do từ chối <span className="text-destructive">*</span></label>
+                            <input
+                                type="text"
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-primary"
+                                disabled={reviewing}
+                                placeholder="Nhập lý do từ chối bài viết"
+                            />
+                        </div>
+
+                        <div className="flex gap-2 justify-end">
+                            <Button variant="ghost" onClick={() => setRejectingPost(null)}>
+                                Hủy
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                disabled={reviewing || !rejectionReason.trim()}
+                                onClick={handleReject}
+                            >
+                                Xác nhận từ chối
+                            </Button>
+                        </div>
                     </div>
-                    <DialogFooter className="flex gap-2">
-                        <Button variant="ghost" onClick={() => setRejectingPost(null)}>
-                            Hủy
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            disabled={reviewing || !rejectionReason.trim()}
-                            onClick={handleReject}
-                        >
-                            Xác nhận từ chối
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </div>
+            )}
         </div>
     );
 }
