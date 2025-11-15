@@ -1,11 +1,10 @@
 import ArticleCard from "@/components/ArticleCard"
-import { Input } from "@/components/ui/input"
 import { useState, useEffect, useMemo } from "react"
 import { articleService } from "@/services/articleService"
 import { Link } from "react-router-dom"
 
 export default function Home() {
-    const [searchQuery, setSearchQuery] = useState('')
+    
 
     type Post = {
         _id: string;
@@ -30,14 +29,6 @@ export default function Home() {
     const [totalPages, setTotalPages] = useState(1)
     const [isLoading, setIsLoading] = useState(false)
     const [limit] = useState(9)
-    const [selectedCategory, setSelectedCategory] = useState<string>("")
-    const categories = useMemo(() => {
-        const s = new Set<string>()
-        posts.forEach(p => {
-            if (p.tags && p.tags.length > 0) p.tags.forEach(t => s.add(t))
-        })
-        return Array.from(s)
-    }, [posts])
 
     // derive popular lists from API-fetched posts
     const popularArticles = useMemo(() => {
@@ -68,22 +59,17 @@ export default function Home() {
         const exclude = new Set<string>();
         popularArticles.forEach(p => exclude.add(p._id));
         popularPosts.forEach(p => exclude.add(p.id));
-        // apply search filter on posts first
-        const q = searchQuery.trim().toLowerCase();
-        const base = !q ? posts : posts.filter(article => {
-            const inTitle = article.title?.toLowerCase().includes(q)
-            const inSummary = article.summary?.toLowerCase().includes(q)
-            return inTitle || inSummary
-        })
+        // no client-side search applied here (removed unused search state)
+        const base = posts
         return base.filter(p => !exclude.has(p._id))
-    }, [posts, searchQuery, popularArticles, popularPosts])
+    }, [posts, popularArticles, popularPosts])
 
     useEffect(() => {
         const fetchPosts = async () => {
             setIsLoading(true)
             try {
                 // use centralized service which wraps axiosInstance
-                const res = await articleService.getPosts({ page: currentPage, limit, category: selectedCategory || undefined })
+                const res = await articleService.getPosts({ page: currentPage, limit })
                 // backend shape: { success, message, data: { posts: [], pagination: {...} } }
                 const apiData = res?.data || res
                 const loadedPosts = apiData?.posts || apiData || []
@@ -99,7 +85,7 @@ export default function Home() {
             }
         }
         fetchPosts()
-    }, [currentPage, limit, selectedCategory])
+    }, [currentPage, limit])
 
     // (filtered logic is applied inside visibleArticles to ensure dedupe)
 
@@ -125,7 +111,7 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-            <section className="space-y-6">
+            {/* <section className="space-y-6">
                 <div className="text-center">
                     <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Tất cả bài viết</h1>
                     <p className="text-muted-foreground mt-2">Khám phá các bài viết mới nhất từ cộng đồng</p>
@@ -151,7 +137,7 @@ export default function Home() {
                         />
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             {/* Popular Articles Section */}
             <section className="space-y-4">
@@ -189,17 +175,17 @@ export default function Home() {
                         {visibleArticles.map((a) => (
                             <div key={a._id || 'unknown'} className="h-full">
                                 <ArticleCard
-                                id={a._id || 'unknown'}
-                                title={a.title || 'Không có tiêu đề'}
-                                excerpt={a.summary || a.excerpt || 'Không có mô tả'}
-                                date={a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : (a.date || 'Chưa có ngày')}
-                                tags={a.tags && a.tags.length > 0 ? a.tags : ['Chưa có tag']}
-                                author={a.userId?.name || a.author || 'Admin'}
-                                authorAvatar={a.userId?.avatar || undefined}
-                                readTime={a.readTime || '5 phút đọc'}
-                                image={a.images && a.images.length > 0 ? a.images[0] : 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop'}
-                                compact
-                            />
+                                    id={a._id || 'unknown'}
+                                    title={a.title || 'Không có tiêu đề'}
+                                    excerpt={a.summary || a.excerpt || 'Không có mô tả'}
+                                    date={a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : (a.date || 'Chưa có ngày')}
+                                    tags={a.tags && a.tags.length > 0 ? a.tags : ['Chưa có tag']}
+                                    author={a.userId?.name || a.author || 'Admin'}
+                                    authorAvatar={a.userId?.avatar || undefined}
+                                    readTime={a.readTime || '5 phút đọc'}
+                                    image={a.images && a.images.length > 0 ? a.images[0] : 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop'}
+                                    compact
+                                />
                             </div>
                         ))}
                     </div>
