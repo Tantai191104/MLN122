@@ -1,6 +1,7 @@
 import ArticleCard from "@/components/ArticleCard"
 import { useState, useEffect, useMemo } from "react"
 import { articleService } from "@/services/articleService"
+import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 
 export default function Home() {
@@ -218,9 +219,9 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl md:text-3xl font-bold">Bài viết phổ biến</h2>
                     <Link to="/posts">
-                        <button className="bg-primary text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-primary/90 transition-all shadow-md hover:shadow-lg">
+                        <Button className="px-6 py-2.5" size="default">
                             Xem tất cả
-                        </button>
+                        </Button>
                     </Link>
                 </div>
 
